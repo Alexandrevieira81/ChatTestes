@@ -1,0 +1,41 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 12 de set. de 2022, 20:06:42
+    Author     : MASTER
+*/
+.vboxMessages{
+
+    -fx-background-color:blueviolet;
+    -fx-border-style:solid inside;
+    -fx-border-width:2;
+
+
+}
+.textArea-textAreaChat-retorno .text
+{
+
+
+    -fx-text-fill: blue;
+    -fx-text-alignment:right;
+
+
+
+}
+.textArea-textAreaChat-envio .text
+{
+
+
+    -fx-text-fill: red;
+    -fx-text-alignment:left;
+
+
+
+}
+.button{
+
+    -fx-border-style:solid inside;
+    -fx-border-width:2;
+}
