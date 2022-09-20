@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import org.json.simple.JSONObject;
 
 /**
  * FXML Controller class
@@ -71,7 +72,27 @@ public class FXMLController implements Initializable {
         } catch (IOException ex) {
             System.out.println("Servidor Encontra-se Offline!");
         }
-        cliente.messageLoop("{\"ra\":\"" + textUsuario.getText() + "\",\"senha\":\"" + textSenha.getText() + "\"}");
+
+        /* {
+            "operacao":"login",
+             "params":{
+                        "ra":"AAAAAAA",
+                        "senha":"123456"
+                        }
+            }
+         */
+        
+        JSONObject params = new JSONObject();
+        params.put("ra",textUsuario.getText());
+        params.put("senha",textSenha.getText());
+        
+        JSONObject obj = new JSONObject();
+        obj.put("operacao", "login");
+        obj.put("params",params);
+        System.out.println(obj);
+        
+        cliente.messageLoop(obj.toJSONString());
+        //cliente.messageLoop("{\"ra\":\"" + textUsuario.getText() + "\",\"senha\":\"" + textSenha.getText() + "\"}");
         // Envia uma mensagem no momento da conexão para identificar o Cliente
 
     }
