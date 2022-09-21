@@ -49,6 +49,10 @@ public class FXMLController implements Initializable {
     private Label lbSenha;
     @FXML
     private TextField textSenha;
+    @FXML
+    private Button btnUsuarios;
+    @FXML
+    private TextArea textAreaUsuarios;
 
     /**
      * Initializes the controller class.
@@ -90,9 +94,8 @@ public class FXMLController implements Initializable {
         JSONObject obj = new JSONObject();
         obj.put("operacao", "login");
         obj.put("params", params);
-        System.out.println(obj);
 
-        cliente.messageLoop(obj.toJSONString());
+        cliente.LogarDeslogar(obj.toJSONString());
         //cliente.messageLoop("{\"ra\":\"" + textUsuario.getText() + "\",\"senha\":\"" + textSenha.getText() + "\"}");
         // Envia uma mensagem no momento da conexão para identificar o Cliente
 
@@ -102,7 +105,7 @@ public class FXMLController implements Initializable {
     private void desconectarChat(ActionEvent event) {
 
         try {
-            cliente.messageLoop("sair#$%");
+            cliente.LogarDeslogar("sair#$%");
             btnEnviar.setDisable(true);
             btnDesconectar.setDisable(true);
             btnConectar.setDisable(false);
@@ -126,23 +129,26 @@ public class FXMLController implements Initializable {
     public void clientMessageReturnLoop() {
 
         String msg;
-        String operacao = " ";
+        
         String status = " ";
+        JSONObject json;
+        JSONParser parser = new JSONParser();
 
         while ((msg = clientSocket.getMessage()) != null) {//pega um interrupção de conexão do servidor, Ex: Queda
             if (msg.equalsIgnoreCase("null")) { //Desconecta pela solicitação do usuário
                 break;
             }
             System.out.println(msg);
-            JSONObject json;
-            JSONParser parser = new JSONParser();
+            String operacao = " ";
             try {
+
                 json = (JSONObject) parser.parse(msg);
+                
                 if ((operacao = (String) json.get("operacao")) == null) {
-                    operacao = "";
+                    operacao = " ";
                 }
                 if ((status = (String) json.get("status")) == null) {
-                    status = "";
+                    status = " ";
                 }
 
             } catch (ParseException ex) {
@@ -150,8 +156,10 @@ public class FXMLController implements Initializable {
             } catch (NullPointerException ev) {
 
             }
+            
+            System.out.println(operacao);
             if (operacao.equals("mensagem")) {
-                
+
                 textAreaChat.appendText(msg + "\n");
                 try {
                     Thread.sleep(300);
@@ -159,9 +167,16 @@ public class FXMLController implements Initializable {
                     Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                // textAreaChat.getStyleClass().add("textArea-textAreaChat-retorno");
-                
+            } else if (operacao.equals("lista")) {
 
+                textAreaUsuarios.appendText(msg + "\n");
+                  try {
+                    Thread.sleep(300);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                // textAreaChat.getStyleClass().add("textArea-textAreaChat-retorno");
             } else if (status.equals("200")) {
                 System.out.println("Logado com Sucesso!");
 
@@ -183,6 +198,18 @@ public class FXMLController implements Initializable {
             System.out.println("Problemas ao encerrar conexão");
         }
 
+    }
+
+    @FXML
+    private void listarUsuarios(ActionEvent event) {
+
+        try {
+            cliente.carregaUsuarios();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
