@@ -19,6 +19,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * FXML Controller class
@@ -81,16 +83,15 @@ public class FXMLController implements Initializable {
                         }
             }
          */
-        
         JSONObject params = new JSONObject();
-        params.put("ra",textUsuario.getText());
-        params.put("senha",textSenha.getText());
-        
+        params.put("ra", textUsuario.getText());
+        params.put("senha", textSenha.getText());
+
         JSONObject obj = new JSONObject();
         obj.put("operacao", "login");
-        obj.put("params",params);
+        obj.put("params", params);
         System.out.println(obj);
-        
+
         cliente.messageLoop(obj.toJSONString());
         //cliente.messageLoop("{\"ra\":\"" + textUsuario.getText() + "\",\"senha\":\"" + textSenha.getText() + "\"}");
         // Envia uma mensagem no momento da conexão para identificar o Cliente
@@ -125,19 +126,49 @@ public class FXMLController implements Initializable {
     public void clientMessageReturnLoop() {
 
         String msg;
+        String operacao = " ";
+        String status = " ";
 
         while ((msg = clientSocket.getMessage()) != null) {//pega um interrupção de conexão do servidor, Ex: Queda
             if (msg.equalsIgnoreCase("null")) { //Desconecta pela solicitação do usuário
                 break;
             }
+            System.out.println(msg);
+            JSONObject json;
+            JSONParser parser = new JSONParser();
             try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                json = (JSONObject) parser.parse(msg);
+                if ((operacao = (String) json.get("operacao")) == null) {
+                    operacao = "";
+                }
+                if ((status = (String) json.get("status")) == null) {
+                    status = "";
+                }
 
-            // textAreaChat.getStyleClass().add("textArea-textAreaChat-retorno");
-            textAreaChat.appendText(msg + "\n");
+            } catch (ParseException ex) {
+                Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NullPointerException ev) {
+
+            }
+            if (operacao.equals("mensagem")) {
+                
+                textAreaChat.appendText(msg + "\n");
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                // textAreaChat.getStyleClass().add("textArea-textAreaChat-retorno");
+                
+
+            } else if (status.equals("200")) {
+                System.out.println("Logado com Sucesso!");
+
+            } else if (status.equals("401")) {
+                System.out.println("Login ou Senha Incorretos!");
+
+            }
 
         }
 
