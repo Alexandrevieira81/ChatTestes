@@ -133,13 +133,15 @@ public class FXMLController implements Initializable {
         String status = " ";
         JSONObject json;
         JSONParser parser = new JSONParser();
+        String operacao;
 
         while ((msg = clientSocket.getMessage()) != null) {//pega um interrupção de conexão do servidor, Ex: Queda
             if (msg.equalsIgnoreCase("null")) { //Desconecta pela solicitação do usuário
                 break;
             }
             System.out.println(msg);
-            String operacao = " ";
+            operacao = " ";//realimentar a variável a cada entrada do loop previve um problema 
+                           //caso o json venha com formato inconsistente
             try {
 
                 json = (JSONObject) parser.parse(msg);
